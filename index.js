@@ -12,12 +12,6 @@ const zeroPadding = (num, length, char = '0') => {
 const zp = (num, length, char = '0') => zeroPadding(num, length, char);
 const p = (num, length, char = ' ') => num.toString().padStart(length, char);
 
-const findBusStop = async (busStopId) => {
-  const response = await axios.get(`https://search.map.kakao.com/mapsearch/map.daum?q=${busStopId}`);
-  const busData = response.data;
-  return busData;
-}
-
 const timeString = (time) => {
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
@@ -40,8 +34,8 @@ const getBusArrivalTimes = async (busStopId, busNumber, i, loop) => {
           busNumber: line.name,
           time: line.arrival.arrivalTime,
           time2: line.arrival.arrivalTime2,
-          busStopCount: line.arrival.busStopCount,
-          busStopCount2: line.arrival.busStopCount2,
+          stopt: line.arrival.busStopCount,
+          stop2: line.arrival.busStopCount2,
         }];
       }
       return [];
@@ -56,9 +50,8 @@ const getBusArrivalTimes = async (busStopId, busNumber, i, loop) => {
     );
     
     // 결과 출력
-    arrivalTimes.forEach(({ busNumber, time, time2, busStopCount, busStopCount2 }) => {
-      console.log(`${p(busNumber, 4)} : ${timeString(time)} ${time2 ? `/ ${timeString(time2)}` : ''}`);
-      console.log(`    남은 정류장: ${busStopCount ?? '-'} / ${busStopCount2 ?? '-'}`);
+    arrivalTimes.forEach(({ busNumber, time, time2, stopt, stop2 }) => {
+      console.log(`${p(busNumber, 4)} : ${timeString(time)}(${stopt ?? '-'}) ${time2 ? `/ ${timeString(time2)}(${stop2 ?? '-'})` : ''}`);
     });
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error);
