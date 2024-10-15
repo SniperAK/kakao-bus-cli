@@ -1,6 +1,6 @@
 {
   "name": "kakao-bus-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "카카오 API를 활용하여 버스 정류장 버스 도착 정보를 조회",
   "main": "index.js",
   "type": "module",

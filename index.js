@@ -51,7 +51,7 @@ const getBusArrivalTimes = async (busStopId, busNumber, i, loop) => {
     
     // 결과 출력
     arrivalTimes.forEach(({ busNumber, time, time2, stopt, stop2 }) => {
-      console.log(`${p(busNumber, 4)} : ${timeString(time)}(${stopt ?? '-'}) ${time2 ? `/ ${timeString(time2)}(${stop2 ?? '-'})` : ''}`);
+      console.log(`${p(busNumber, 4)} : ${timeString(time)}(${p(stopt, 2) ?? '-'}) ${time2 ? `/ ${timeString(time2)}(${p(stop2, 2) ?? '-'})` : ''}`);
     });
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error);
