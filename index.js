@@ -21,8 +21,8 @@ const findBusStop = async (busStopId) => {
 const timeString = (time) => {
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
-  if(minutes > 0) return `${p(minutes, 2)}분 ${p(seconds, 2)}초`;
-  if(seconds > 0) return `${p(0, 2)}분 ${p(seconds, 2)}초`;
+  if (minutes > 0) return `${p(minutes, 2)}분 ${p(seconds, 2)}초`;
+  if (seconds > 0) return `${p(0, 2)}분 ${p(seconds, 2)}초`;
   return '도착';
 }
 
@@ -34,33 +34,36 @@ const getBusArrivalTimes = async (busStopId, busNumber, i, loop) => {
 
     // 각 버스 노선의 도착 시간 정보 추출
     const arrivalTimes = busData.lines.map(line => {
-      if((busNumbers.length > 0 && !busNumbers.includes(line.name))) return [];
+      if ((busNumbers.length > 0 && !busNumbers.includes(line.name))) return [];
       if (line.arrival) {
         return [{
           busNumber: line.name,
           time: line.arrival.arrivalTime,
           time2: line.arrival.arrivalTime2,
+          busStopCount: line.arrival.busStopCount,
+          busStopCount2: line.arrival.busStopCount2,
         }];
       }
       return [];
     }).flat();
     
     console.log(
-      [ 
+      [
         ' - ',
-        loop > 1 && `[${i}/${loop}]`,
+        loop > 1 && `[${i + 1}/${loop}]`,
         busData.name,
       ].filter(Boolean).join(' ')
     );
+    
     // 결과 출력
-    arrivalTimes.forEach(({busNumber, time, time2}) => {
+    arrivalTimes.forEach(({ busNumber, time, time2, busStopCount, busStopCount2 }) => {
       console.log(`${p(busNumber, 4)} : ${timeString(time)} ${time2 ? `/ ${timeString(time2)}` : ''}`);
+      console.log(`    남은 정류장: ${busStopCount ?? '-'} / ${busStopCount2 ?? '-'}`);
     });
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error);
   }
 };
-
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -73,17 +76,15 @@ program
   .addArgument(new Argument('[loop]', '호출 횟수를 입력하세요. 30초 주기로 조회 합니다.').default(1))
   .helpCommand(true)
   .action(async (_busStopId, busNumber, loop) => {
-    if( loop < 0) loop = Number.MAX_SAFE_INTEGER;
+    if (loop < 0) loop = Number.MAX_SAFE_INTEGER;
     const busStopIds = _busStopId.split(',').map(n => n.trim());
-    for(let i = 0; i < loop; i++) {
-      console.log(`\n[${i}] ${new Date().toLocaleTimeString()}\n`);
-      for(let j = 0; j < busStopIds.length; j++) {
+    for (let i = 0; i < loop; i++) {
+      console.log(`\n[${i + 1}] ${new Date().toLocaleTimeString()}\n`);
+      for (let j = 0; j < busStopIds.length; j++) {
         const busStopId = busStopIds[j];
         await getBusArrivalTimes(busStopId, busNumber, i, loop);
       }
-      if( loop > 1 && i < loop - 1) await delay(30 * 1000);
+      if (loop > 1 && i < loop - 1) await delay(30 * 1000);
     }
   })
   .parse(process.argv);
-
-  
